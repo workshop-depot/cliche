@@ -1,3 +1,7 @@
+cliche-lab/cliche-lab
+main-packr.go
+cliche
+
 # Binaries for programs and plugins
 *.exe
 *.dll
