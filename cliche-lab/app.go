@@ -65,7 +65,7 @@ func loadHCL(ptr interface{}, filePath ...string) error {
 
 func app() {
 	if err := loadHCL(&conf); err != nil {
-		log.Fatalln("error:", err)
+		log.Println("warn:", err)
 		return
 	}
 
