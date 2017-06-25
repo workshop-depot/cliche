@@ -13,12 +13,13 @@ then
     GoVersion=${BASH_REMATCH[0]}
 fi
 
-if [[ $(git tag) =~ [^[:space:]]+ ]];
+GV=$(git tag || echo 'N/A')
+if [[ $GV =~ [^[:space:]]+ ]];
 then
     GitTag=${BASH_REMATCH[0]}
 fi
 
-GH=$(git log -1 --pretty=format:%h)
+GH=$(git log -1 --pretty=format:%h || echo 'N/A')
 if [[ GH =~ 'fatal' ]];
 then
     CommitHash=N/A
