@@ -121,6 +121,9 @@ func create(appName, fileName string) error {
 	if content, err = box.MustBytes(fileName); err != nil {
 		return err
 	}
+	if conf.New.Author != "N/A" && conf.New.Copyright == "N/A" {
+		conf.New.Copyright = conf.New.Author
+	}
 	cntnt := string(content)
 	cntnt = strings.Replace(cntnt, "__appname__", conf.New.Name, -1)
 	cntnt = strings.Replace(cntnt, "__author__", conf.New.Author, -1)
