@@ -34,7 +34,7 @@ func simpleSupervisor(
 	goroutines.New().
 		AddToGroup(wg).
 		Recover(func(e interface{}) {
-			time.Sleep(time.Millisecond * 10)
+			time.Sleep(dt)
 			go simpleSupervisor(intensity, fn, dt)
 		}).
 		Go(fn)
