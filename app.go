@@ -156,6 +156,7 @@ func cmdNew(*cli.Context) error {
 		"main.go",
 		"utils.go",
 		"app.conf",
+		".gitignore",
 	}
 	for _, v := range files {
 		if err := create(name, v); err != nil {
