@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"context"
 	"log"
 	"os"
@@ -15,11 +16,53 @@ import (
 	"github.com/dc0d/goroutines"
 )
 
+var bufferPool = sync.Pool{
+	New: func() interface{} {
+		return &bytes.Buffer{}
+	},
+}
+
+func getBuffer() *bytes.Buffer {
+	buff := bufferPool.Get().(*bytes.Buffer)
+	buff.Reset()
+	return buff
+}
+
+func putBuffer(buff *bytes.Buffer) {
+	bufferPool.Put(buff)
+}
+
+// Errors .
+type Errors []error
+
+func (x Errors) String() string {
+	return x.Error()
+}
+
+func (x Errors) Error() string {
+	if x == nil {
+		return ``
+	}
+
+	buff := getBuffer()
+	defer putBuffer(buff)
+
+	for _, ve := range x {
+		if ve == nil {
+			continue
+		}
+		buff.WriteString(` [` + ve.Error() + `]`)
+	}
+	res := strings.TrimSpace(buff.String())
+
+	return res
+}
+
 // simpleSupervisor is a simple supervisor in the context of this app (uses wg),
 // if intensity < 0 runs forever, default period is 1 second.
 func simpleSupervisor(
 	intensity int,
-	fn func(),
+	fn func() error,
 	period ...time.Duration) {
 	if intensity == 0 {
 		return
@@ -31,13 +74,20 @@ func simpleSupervisor(
 	if len(period) > 0 {
 		dt = period[0]
 	}
+	retry := func() {
+		time.Sleep(dt)
+		go simpleSupervisor(intensity, fn, dt)
+	}
 	goroutines.New().
 		AddToGroup(wg).
 		Recover(func(e interface{}) {
-			time.Sleep(dt)
-			go simpleSupervisor(intensity, fn, dt)
+			retry()
 		}).
-		Go(fn)
+		Go(func() {
+			if err := fn(); err != nil {
+				retry()
+			}
+		})
 }
 
 const (
