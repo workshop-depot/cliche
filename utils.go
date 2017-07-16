@@ -16,6 +16,11 @@ import (
 	"github.com/dc0d/goroutines"
 )
 
+// Error constant error
+type Error string
+
+func (v Error) Error() string { return string(v) }
+
 var bufferPool = sync.Pool{
 	New: func() interface{} {
 		return &bytes.Buffer{}
@@ -64,6 +69,11 @@ func simpleSupervisor(
 	intensity int,
 	fn func() error,
 	period ...time.Duration) {
+	select {
+	case <-ctx.Done():
+		return
+	default:
+	}
 	if intensity == 0 {
 		return
 	}
@@ -71,21 +81,22 @@ func simpleSupervisor(
 		intensity--
 	}
 	dt := time.Second
-	if len(period) > 0 {
+	if len(period) > 0 && period[0] > 0 {
 		dt = period[0]
 	}
-	retry := func() {
+	retry := func(e interface{}) {
+		log.Println("error:", e)
 		time.Sleep(dt)
 		go simpleSupervisor(intensity, fn, dt)
 	}
 	goroutines.New().
 		AddToGroup(wg).
 		Recover(func(e interface{}) {
-			retry()
+			retry(e)
 		}).
 		Go(func() {
 			if err := fn(); err != nil {
-				retry()
+				retry(err)
 			}
 		})
 }
