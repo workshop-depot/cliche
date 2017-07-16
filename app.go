@@ -72,7 +72,7 @@ func app() {
 	app := cli.NewApp()
 
 	{
-		app.Version = "0.1.2"
+		app.Version = "0.3.1"
 		app.Author = "dc0d"
 		app.Copyright = "dc0d"
 		now := time.Now()
