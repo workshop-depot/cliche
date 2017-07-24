@@ -11,16 +11,7 @@ import (
 
 	"github.com/dc0d/argify"
 	"github.com/gobuffalo/packr"
-	"github.com/hashicorp/hcl"
 	"github.com/urfave/cli"
-)
-
-// build flags
-var (
-	BuildTime  string
-	CommitHash string
-	GoVersion  string
-	GitTag     string
 )
 
 var conf struct {
@@ -29,38 +20,6 @@ var conf struct {
 		Author    string `envvar:"-" value:"N/A"`
 		Copyright string `envvar:"-" value:"N/A"`
 	}
-}
-
-func defaultAppNameHandler() string {
-	return filepath.Base(os.Args[0])
-}
-
-func defaultConfNameHandler() string {
-	fp := fmt.Sprintf("%s.conf", defaultAppNameHandler())
-	if _, err := os.Stat(fp); err != nil {
-		fp = "app.conf"
-	}
-	return fp
-}
-
-func loadHCL(ptr interface{}, filePath ...string) error {
-	var fp string
-	if len(filePath) > 0 {
-		fp = filePath[0]
-	}
-	if fp == "" {
-		fp = defaultConfNameHandler()
-	}
-	cn, err := ioutil.ReadFile(fp)
-	if err != nil {
-		return err
-	}
-	err = hcl.Unmarshal(cn, ptr)
-	if err != nil {
-		return err
-	}
-
-	return nil
 }
 
 func app() {
@@ -72,7 +31,7 @@ func app() {
 	app := cli.NewApp()
 
 	{
-		app.Version = "0.3.1"
+		app.Version = "0.5.0"
 		app.Author = "dc0d"
 		app.Copyright = "dc0d"
 		now := time.Now()

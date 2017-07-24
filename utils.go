@@ -3,9 +3,12 @@ package main
 import (
 	"bytes"
 	"context"
+	"fmt"
+	"io/ioutil"
 	"log"
 	"os"
 	"os/signal"
+	"path/filepath"
 	"runtime"
 	"strings"
 	"sync"
@@ -14,6 +17,7 @@ import (
 
 	"github.com/comail/colog"
 	"github.com/dc0d/goroutines"
+	"github.com/hashicorp/hcl"
 )
 
 // value error
@@ -63,31 +67,39 @@ func (x colErr) Error() string {
 	return res
 }
 
-const (
-	noCaller = "N/A"
+var (
+	noCaller error = valErr("N/A")
 )
 
-func caller() string {
+func caller() (funcName, fileName string, fileLine int, callerErr error) {
 	fpcs := make([]uintptr, 1)
 	n := runtime.Callers(3, fpcs)
 	if n == 0 {
-		return noCaller
+		return "", "", -1, noCaller
 	}
 	fun := runtime.FuncForPC(fpcs[0] - 1)
 	if fun == nil {
-		return noCaller
+		return "", "", -1, noCaller
 	}
 	name := fun.Name()
+	fileName, fileLine = fun.FileLine(fun.Entry())
+	fileName = filepath.Base(fileName)
 	ix := strings.LastIndex(name, ".")
 	if ix > 0 && (ix+1) < len(name) {
 		name = name[ix+1:]
 	}
-	return name
+	funcName = name
+	return
 }
 
 func timerScope(name string, opCount ...int) func() {
 	if name == "" {
-		name = caller()
+		funcName, fileName, fileLine, err := caller()
+		if err != nil {
+			name = "N/A"
+		} else {
+			name = fmt.Sprintf("%s(?) @ %s-L%v", funcName, fileName, fileLine)
+		}
 	}
 	log.Println(name, `started`)
 	start := time.Now()
@@ -172,4 +184,44 @@ func finit(timeout time.Duration, cancelApp ...bool) {
 	if werr != nil {
 		log.Println("error:", werr)
 	}
+}
+
+// build flags
+var (
+	BuildTime  string
+	CommitHash string
+	GoVersion  string
+	GitTag     string
+)
+
+func defaultAppNameHandler() string {
+	return filepath.Base(os.Args[0])
+}
+
+func defaultConfNameHandler() string {
+	fp := fmt.Sprintf("%s.conf", defaultAppNameHandler())
+	if _, err := os.Stat(fp); err != nil {
+		fp = "app.conf"
+	}
+	return fp
+}
+
+func loadHCL(ptr interface{}, filePath ...string) error {
+	var fp string
+	if len(filePath) > 0 {
+		fp = filePath[0]
+	}
+	if fp == "" {
+		fp = defaultConfNameHandler()
+	}
+	cn, err := ioutil.ReadFile(fp)
+	if err != nil {
+		return err
+	}
+	err = hcl.Unmarshal(cn, ptr)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

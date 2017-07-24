@@ -2,23 +2,12 @@ package main
 
 import (
 	"fmt"
-	"io/ioutil"
 	"log"
 	"os"
-	"path/filepath"
 	"time"
 
 	"github.com/dc0d/argify"
-	"github.com/hashicorp/hcl"
 	"github.com/urfave/cli"
-)
-
-// build flags
-var (
-	BuildTime  string
-	CommitHash string
-	GoVersion  string
-	GitTag     string
 )
 
 var conf struct {
@@ -29,38 +18,6 @@ var conf struct {
 			Param string `envvar:"-"`
 		}
 	}
-}
-
-func defaultAppNameHandler() string {
-	return filepath.Base(os.Args[0])
-}
-
-func defaultConfNameHandler() string {
-	fp := fmt.Sprintf("%s.conf", defaultAppNameHandler())
-	if _, err := os.Stat(fp); err != nil {
-		fp = "app.conf"
-	}
-	return fp
-}
-
-func loadHCL(ptr interface{}, filePath ...string) error {
-	var fp string
-	if len(filePath) > 0 {
-		fp = filePath[0]
-	}
-	if fp == "" {
-		fp = defaultConfNameHandler()
-	}
-	cn, err := ioutil.ReadFile(fp)
-	if err != nil {
-		return err
-	}
-	err = hcl.Unmarshal(cn, ptr)
-	if err != nil {
-		return err
-	}
-
-	return nil
 }
 
 func app() {
@@ -89,14 +46,16 @@ func app() {
 	{
 		app.Action = cmdApp
 
-		c := cli.Command{
-			Name: `sample`,
-		}
-		c.Subcommands = append(c.Subcommands, cli.Command{
-			Name:   "subcommand",
-			Action: cmdSampleSubCommand,
-		})
-		app.Commands = append(app.Commands, c)
+		/*
+			c := cli.Command{
+				Name: `sample`,
+			}
+			c.Subcommands = append(c.Subcommands, cli.Command{
+				Name:   "subcommand",
+				Action: cmdSampleSubCommand,
+			})
+			app.Commands = append(app.Commands, c)
+		*/
 	}
 
 	argify.NewArgify().Build(app, &conf)
@@ -107,13 +66,16 @@ func app() {
 }
 
 func cmdApp(*cli.Context) error {
+	defer timerScope("")()
 	defer finit(time.Second, true)
-	fmt.Println(conf.Info, "ʕ⚆ϖ⚆ʔ")
+	log.Println(conf.Info, "ʕ⚆ϖ⚆ʔ")
 	return nil
 }
 
+/*
 func cmdSampleSubCommand(*cli.Context) error {
 	defer finit(time.Second, true)
-	fmt.Println(conf.Sample.SubCommand.Param)
+	log.Println(conf.Sample.SubCommand.Param)
 	return nil
 }
+*/
