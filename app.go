@@ -89,8 +89,10 @@ func app() {
 
 	{
 		c := cli.Command{
-			Name:   "new",
-			Action: cmdNew,
+			Name:        "new",
+			Action:      cmdNew,
+			Usage:       "cliche new --name <cli_app_name> --author <author> --copyright <copyright>",
+			Description: "creates a new cli app",
 		}
 		app.Commands = append(app.Commands, c)
 	}

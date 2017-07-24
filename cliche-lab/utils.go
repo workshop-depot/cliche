@@ -16,10 +16,10 @@ import (
 	"github.com/dc0d/goroutines"
 )
 
-// Error constant error
-type Error string
+// value error
+type valErr string
 
-func (v Error) Error() string { return string(v) }
+func (v valErr) Error() string { return string(v) }
 
 var bufferPool = sync.Pool{
 	New: func() interface{} {
@@ -37,14 +37,14 @@ func putBuffer(buff *bytes.Buffer) {
 	bufferPool.Put(buff)
 }
 
-// Errors .
-type Errors []error
+// collection of errors
+type colErr []error
 
-func (x Errors) String() string {
+func (x colErr) String() string {
 	return x.Error()
 }
 
-func (x Errors) Error() string {
+func (x colErr) Error() string {
 	if x == nil {
 		return ``
 	}
@@ -61,44 +61,6 @@ func (x Errors) Error() string {
 	res := strings.TrimSpace(buff.String())
 
 	return res
-}
-
-// simpleSupervisor is a simple supervisor in the context of this app (uses wg),
-// if intensity < 0 runs forever, default period is 1 second.
-func simpleSupervisor(
-	intensity int,
-	fn func() error,
-	period ...time.Duration) {
-	select {
-	case <-ctx.Done():
-		return
-	default:
-	}
-	if intensity == 0 {
-		return
-	}
-	if intensity > 0 {
-		intensity--
-	}
-	dt := time.Second
-	if len(period) > 0 && period[0] > 0 {
-		dt = period[0]
-	}
-	retry := func(e interface{}) {
-		log.Println("error:", e)
-		time.Sleep(dt)
-		go simpleSupervisor(intensity, fn, dt)
-	}
-	goroutines.New().
-		AddToGroup(wg).
-		Recover(func(e interface{}) {
-			retry(e)
-		}).
-		Go(func() {
-			if err := fn(); err != nil {
-				retry(err)
-			}
-		})
 }
 
 const (
@@ -183,30 +145,29 @@ func callOnSignal(f func(), sig ...os.Signal) {
 }
 
 var (
-	ctx    context.Context
-	cancel context.CancelFunc
-	wg     *sync.WaitGroup
+	appCtx    context.Context
+	appCancel context.CancelFunc
+	appWG     = &sync.WaitGroup{}
 )
 
 func init() {
-	wg = &sync.WaitGroup{}
 	colog.Register()
 	colog.SetFlags(log.Lshortfile)
 
-	ctx, cancel = context.WithCancel(context.Background())
-	callOnSignal(func() { cancel() })
+	appCtx, appCancel = context.WithCancel(context.Background())
+	callOnSignal(func() { appCancel() })
 }
 
 func finit(timeout time.Duration, cancelApp ...bool) {
 	if len(cancelApp) > 0 && cancelApp[0] {
-		cancel()
+		appCancel()
 	}
-	<-ctx.Done()
+	<-appCtx.Done()
 	werr := goroutines.New().
 		EnsureStarted().
 		Timeout(timeout).
 		Go(func() {
-			wg.Wait()
+			appWG.Wait()
 		})
 	if werr != nil {
 		log.Println("error:", werr)
