@@ -31,9 +31,9 @@ func app() {
 	app := cli.NewApp()
 
 	{
-		app.Version = "0.5.0"
+		app.Version = "0.5.1"
 		app.Author = "dc0d"
-		app.Copyright = "dc0d"
+		app.Copyright = "kaveh.shahbazian@gmail.com"
 		now := time.Now()
 		app.Description = fmt.Sprintf(
 			"Build Time:  %v %v\n   Go:          %v\n   Commit Hash: %v\n   Git Tag:     %v",

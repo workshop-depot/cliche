@@ -98,7 +98,7 @@ func timerScope(name string, opCount ...int) func() {
 		if err != nil {
 			name = "N/A"
 		} else {
-			name = fmt.Sprintf("%s(?) @ %s-L%v", funcName, fileName, fileLine)
+			name = fmt.Sprintf("%s(...) @ %s-L%v", funcName, fileName, fileLine)
 		}
 	}
 	log.Println(name, `started`)
