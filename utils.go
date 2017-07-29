@@ -49,8 +49,8 @@ func (x colErr) String() string {
 }
 
 func (x colErr) Error() string {
-	if x == nil {
-		return ``
+	if len(x) == 0 {
+		return ""
 	}
 
 	buff := getBuffer()
