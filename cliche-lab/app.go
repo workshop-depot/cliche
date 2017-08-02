@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/dc0d/argify"
+	"github.com/dc0d/public-club/appclub"
 	"github.com/urfave/cli"
 )
 
@@ -21,7 +22,7 @@ var conf struct {
 }
 
 func app() {
-	if err := loadHCL(&conf); err != nil {
+	if err := appclub.LoadHCL(&conf); err != nil {
 		log.Println("warn:", err)
 	}
 
@@ -66,7 +67,6 @@ func app() {
 }
 
 func cmdApp(*cli.Context) error {
-	defer timerScope("")()
 	defer finit(time.Second, true)
 	log.Println(conf.Info, "ʕ⚆ϖ⚆ʔ")
 	return nil
