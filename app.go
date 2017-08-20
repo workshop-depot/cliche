@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/dc0d/argify"
+	"github.com/dc0d/cliche/tad"
 	"github.com/gobuffalo/packr"
 	"github.com/urfave/cli"
 )
@@ -31,7 +32,7 @@ func app() {
 	app := cli.NewApp()
 
 	{
-		app.Version = "0.7.0"
+		app.Version = "0.8.0"
 		app.Author = "dc0d"
 		app.Copyright = "kaveh.shahbazian@gmail.com"
 		now := time.Now()
@@ -72,7 +73,7 @@ func init() {
 }
 
 func cmdApp(*cli.Context) error {
-	defer finit(time.Second, true)
+	defer tad.Finit(time.Second, true)
 	return nil
 }
 
@@ -102,7 +103,7 @@ func create(appName, fileName string) error {
 }
 
 func cmdNew(*cli.Context) error {
-	defer finit(time.Second, true)
+	defer tad.Finit(time.Second, true)
 	name := conf.New.Name
 	if name == "" {
 		return fmt.Errorf("name is required")

@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/dc0d/argify"
+	"github.com/dc0d/cliche/tad"
 	"github.com/urfave/cli"
 )
 
@@ -21,7 +22,7 @@ var conf struct {
 }
 
 func app() {
-	if err := loadHCL(&conf); err != nil {
+	if err := tad.LoadHCL(&conf); err != nil {
 		log.Println("warn:", err)
 	}
 
@@ -66,7 +67,7 @@ func app() {
 }
 
 func cmdApp(*cli.Context) error {
-	defer finit(time.Second, true)
+	defer tad.Finit(time.Second, true)
 	log.Println(conf.Info, "ʕ⚆ϖ⚆ʔ")
 	return nil
 }
