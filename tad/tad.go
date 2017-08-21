@@ -58,7 +58,7 @@ func Supervise(action func() error, intensity int, period ...time.Duration) {
 			intensity--
 		}
 		if err := runOnce(action); err != nil {
-			log.Error(err)
+			log.Errorf("supervised %v", err)
 			time.Sleep(dt)
 		} else {
 			break
@@ -73,6 +73,7 @@ func runOnce(action func() error) (errrun error) {
 				errrun = err
 				return
 			}
+			errrun = Errorf("UNKNOWN: %v", e)
 		}
 	}()
 	return action()
