@@ -30,3 +30,6 @@ func init() {
 
 // SetLogger replaces logger for this package
 func SetLogger(logger Logger) { log = logger }
+
+// GetLogger .
+func GetLogger() Logger { return log }

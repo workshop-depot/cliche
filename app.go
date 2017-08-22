@@ -3,14 +3,10 @@ package main
 import (
 	"fmt"
 	"io/ioutil"
-	"log"
 	"os"
 	"path/filepath"
 	"strings"
-	"time"
 
-	"github.com/dc0d/argify"
-	"github.com/dc0d/cliche/tad"
 	"github.com/gobuffalo/packr"
 	"github.com/urfave/cli"
 )
@@ -23,47 +19,6 @@ var conf struct {
 	}
 }
 
-func app() {
-	// if err := loadHCL(&conf); err != nil {
-	// 	log.Println("warn:", err)
-	// 	return
-	// }
-
-	app := cli.NewApp()
-
-	{
-		app.Version = "0.8.0"
-		app.Author = "dc0d"
-		app.Copyright = "kaveh.shahbazian@gmail.com"
-		now := time.Now()
-		app.Description = fmt.Sprintf(
-			"Build Time:  %v %v\n   Go:          %v\n   Commit Hash: %v\n   Git Tag:     %v",
-			now.Weekday(),
-			BuildTime,
-			GoVersion,
-			CommitHash,
-			GitTag)
-		app.Name = "cliche"
-		app.Usage = ""
-	}
-
-	{
-		c := cli.Command{
-			Name:        "new",
-			Action:      cmdNew,
-			Usage:       "cliche new --name <cli_app_name> --author <author> --copyright <copyright>",
-			Description: "creates a new cli app",
-		}
-		app.Commands = append(app.Commands, c)
-	}
-
-	argify.NewArgify().Build(app, &conf)
-
-	if err := app.Run(os.Args); err != nil {
-		log.Fatalln("error:", err)
-	}
-}
-
 var (
 	box packr.Box
 )
@@ -73,7 +28,6 @@ func init() {
 }
 
 func cmdApp(*cli.Context) error {
-	defer tad.Finit(time.Second, true)
 	return nil
 }
 
@@ -103,7 +57,6 @@ func create(appName, fileName string) error {
 }
 
 func cmdNew(*cli.Context) error {
-	defer tad.Finit(time.Second, true)
 	name := conf.New.Name
 	if name == "" {
 		return fmt.Errorf("name is required")
