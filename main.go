@@ -18,7 +18,7 @@ func app() {
 	app := cli.NewApp()
 
 	{
-		app.Version = "0.8.0"
+		app.Version = "0.10.1"
 		app.Author = "dc0d"
 		app.Copyright = "kaveh.shahbazian@gmail.com"
 		now := time.Now()

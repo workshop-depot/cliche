@@ -13,20 +13,12 @@ type WaitGroup interface {
 }
 
 type waitGroup struct {
-	wg sync.WaitGroup
+	sync.WaitGroup
 }
 
-func (wg *waitGroup) Add(delta int) { wg.wg.Add(delta) }
-func (wg *waitGroup) JobDone()      { wg.wg.Done() }
-func (wg *waitGroup) Wait()         { wg.wg.Wait() }
-
-// causes stackoverflow in test - keep it & post it
-// type waitGroup struct {
-// 	sync.WaitGroup
-// }
-// func (wg *waitGroup) Add(delta int) { wg.Add(delta) }
-// func (wg *waitGroup) JobDone()      { wg.Done() }
-// func (wg *waitGroup) Wait()         { wg.Wait() }
+func (wg *waitGroup) Add(delta int) { wg.WaitGroup.Add(delta) }
+func (wg *waitGroup) JobDone()      { wg.WaitGroup.Done() }
+func (wg *waitGroup) Wait()         { wg.WaitGroup.Wait() }
 
 // WorkerContext combination of context.Context & WaitGroup
 type WorkerContext interface {
@@ -41,6 +33,7 @@ type workerContext struct {
 
 // New .
 func New(ctx context.Context) WorkerContext {
+	// TODO: should panic on ctx == nil
 	return &workerContext{
 		Context:   ctx,
 		WaitGroup: &waitGroup{},
