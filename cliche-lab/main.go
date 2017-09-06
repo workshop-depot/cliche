@@ -12,10 +12,6 @@ import (
 )
 
 func main() {
-	app()
-}
-
-func app() {
 	if err := clubaux.LoadHCL(&conf); err != nil {
 		log.Println("warn:", err)
 	}

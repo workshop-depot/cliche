@@ -37,6 +37,6 @@ FLAG="$FLAG -X $TRG_PKG.CommitHash=$CommitHash"
 FLAG="$FLAG -X $TRG_PKG.GoVersion=$GoVersion"
 FLAG="$FLAG -X $TRG_PKG.GitTag=$GitTag"
 
-go build -v -ldflags "$FLAG"
+go build -v -ldflags "$FLAG" && clear
 
 rm ./main-packr.go

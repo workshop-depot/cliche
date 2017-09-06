@@ -11,10 +11,6 @@ import (
 )
 
 func main() {
-	app()
-}
-
-func app() {
 	app := cli.NewApp()
 
 	{
