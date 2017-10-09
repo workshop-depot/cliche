@@ -50,10 +50,7 @@ func create(appName, fileName string) error {
 	if _, err = os.Stat(filePath); err == nil {
 		return fmt.Errorf("file already exists: %v", filePath)
 	}
-	if err = ioutil.WriteFile(filePath, content, 0644); err != nil {
-		return err
-	}
-	return nil
+	return ioutil.WriteFile(filePath, content, 0644)
 }
 
 func cmdNew(*cli.Context) error {
@@ -66,10 +63,10 @@ func cmdNew(*cli.Context) error {
 		return err
 	}
 	files := []string{
-		"app.go",
+		"command-app.go",
 		"build.sh",
 		"main.go",
-		"utils.go",
+		"variables.go",
 		"app.conf",
 		".gitignore",
 	}

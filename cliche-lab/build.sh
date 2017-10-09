@@ -32,4 +32,11 @@ FLAG="$FLAG -X $TRG_PKG.CommitHash=$CommitHash"
 FLAG="$FLAG -X $TRG_PKG.GoVersion=$GoVersion"
 FLAG="$FLAG -X $TRG_PKG.GitTag=$GitTag"
 
-go build -v -ldflags "$FLAG" && clear
+if [[ $1 =~ '-i' ]];
+then
+    echo 'go install'
+    go install -v -ldflags "$FLAG"
+else
+    echo 'go build'
+    go build -v -ldflags "$FLAG"
+fi
