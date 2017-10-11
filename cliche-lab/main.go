@@ -6,12 +6,12 @@ import (
 	"time"
 
 	"github.com/dc0d/argify"
-	"github.com/dc0d/club/clubaux"
+	"github.com/dc0d/club/config/hclconfig"
 	"github.com/urfave/cli"
 )
 
 func main() {
-	if err := clubaux.LoadHCL(&conf); err != nil {
+	if err := hclconfig.New().Load(&conf); err != nil {
 		// this error does not help much, unless we explicitly need it
 		// in which case it should be handled properly
 	}
