@@ -7,27 +7,31 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/gobuffalo/packr"
 	"github.com/urfave/cli"
 )
 
-var conf struct {
-	New struct {
-		Name      string `envvar:"-" usage:"required"`
-		Author    string `envvar:"-" value:"N/A"`
-		Copyright string `envvar:"-" value:"N/A"`
+func cmdNew(*cli.Context) error {
+	name := conf.New.Name
+	if name == "" {
+		return fmt.Errorf("name is required")
 	}
-}
-
-var (
-	box packr.Box
-)
-
-func init() {
-	box = packr.NewBox("./cliche-lab")
-}
-
-func cmdApp(*cli.Context) error {
+	if err := os.Mkdir(name, 0774); err != nil &&
+		!strings.Contains(err.Error(), "file exists") {
+		return err
+	}
+	files := []string{
+		"command-app.go",
+		"build.sh",
+		"main.go",
+		"variables.go",
+		"app.ini",
+		".gitignore",
+	}
+	for _, v := range files {
+		if err := create(name, v); err != nil {
+			return err
+		}
+	}
 	return nil
 }
 
@@ -51,29 +55,4 @@ func create(appName, fileName string) error {
 		return fmt.Errorf("file already exists: %v", filePath)
 	}
 	return ioutil.WriteFile(filePath, content, 0644)
-}
-
-func cmdNew(*cli.Context) error {
-	name := conf.New.Name
-	if name == "" {
-		return fmt.Errorf("name is required")
-	}
-	if err := os.Mkdir(name, 0774); err != nil &&
-		!strings.Contains(err.Error(), "file exists") {
-		return err
-	}
-	files := []string{
-		"command-app.go",
-		"build.sh",
-		"main.go",
-		"variables.go",
-		"app.conf",
-		".gitignore",
-	}
-	for _, v := range files {
-		if err := create(name, v); err != nil {
-			return err
-		}
-	}
-	return nil
 }

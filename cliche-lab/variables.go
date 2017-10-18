@@ -3,12 +3,16 @@ package main
 //-----------------------------------------------------------------------------
 
 var conf struct {
-	Info string `envvar:"APP_INFO" usage:"sample app info" value:"bare app structure"`
+	PostgreSQL struct {
+		User     string
+		Password string
+		Database string
+	}
 
-	Sample struct {
-		SubCommand struct {
-			Param string `envvar:"-"`
-		}
+	NATS struct {
+		NATSURL      string
+		NATSUser     string
+		NATSPassword string
 	}
 }
 

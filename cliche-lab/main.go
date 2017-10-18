@@ -6,15 +6,19 @@ import (
 	"time"
 
 	"github.com/dc0d/argify"
-	"github.com/dc0d/club/config/hclconfig"
+	"github.com/dc0d/config/iniconfig"
 	"github.com/urfave/cli"
 )
 
 func main() {
-	if err := hclconfig.New().Load(&conf); err != nil {
+	if err := iniconfig.New().Load(&conf); err != nil {
 		// this error does not help much, unless we explicitly need it
 		// in which case it should be handled properly
 	}
+	// we can use hcl format too. the only difference is
+	// the file extension which is .conf (instead of .ini)
+	// if err := hclconfig.New().Load(&conf); err != nil {
+	// }
 
 	app := cli.NewApp()
 	setAppInfo(app)
